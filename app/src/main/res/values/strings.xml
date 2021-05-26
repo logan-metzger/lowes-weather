@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Lowes Weather - Logan Metzger</string>
+    <string name="lookup_city">Lookup City</string>
+    <string name="please_type_a_city_to_search">Please type a city to search</string>
+</resources>
