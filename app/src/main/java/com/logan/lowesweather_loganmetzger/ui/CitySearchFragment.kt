@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.NavHostFragment
+import com.logan.lowesweather_loganmetzger.R
 import com.logan.lowesweather_loganmetzger.databinding.CitySearchFragmentBinding
 import com.logan.lowesweather_loganmetzger.utils.Resource
 
@@ -33,18 +35,18 @@ class CitySearchFragment : Fragment() {
 
             viewModel.weather.observe(viewLifecycleOwner, Observer { response ->
                 when(response) {
-                    is Resource.Loading -> {}
+                    is Resource.Loading -> {
+
+                    }
                     is Resource.Error -> {
                         binding.cityInput.error = response.msg
                     }
                     is Resource.Success -> {
-
+                        NavHostFragment.findNavController(this).navigate(R.id.weatherFragment)
                     }
                 }
             })
         }
-
-
     }
 
     override fun onDestroy() {

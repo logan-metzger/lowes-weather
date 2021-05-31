@@ -5,46 +5,44 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.logan.lowesweather_loganmetzger.databinding.HourlyItemBinding
 import com.logan.lowesweather_loganmetzger.models.WeatherResponseDTO
+import com.logan.lowesweather_loganmetzger.utils.Resource
 
 class HourlyAdapter(
-    private val onHourClicked:(position: Int) -> Unit
-): RecyclerView.Adapter<HourlyAdapter.HourlyViewHolder>() {
-    private var hourlyWeather: List<WeatherResponseDTO> = listOf()
+    private val onHourClicked: (weather: WeatherResponseDTO) -> Unit,
+    private var hourlyWeather: List<WeatherResponseDTO>
+) : RecyclerView.Adapter<HourlyAdapter.HourlyViewHolder>() {
 
-    fun changeLocation(newWeather: List<WeatherResponseDTO>) {
-        hourlyWeather = newWeather
-        notifyDataSetChanged()
-    }
-
-    class HourlyViewHolder(private val binding: HourlyItemBinding) :RecyclerView.ViewHolder(binding.root) {
-        fun loadData(hourlyWeather: WeatherResponseDTO) = with(binding) {
+    class HourlyViewHolder(private val binding: HourlyItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun loadData(
+            hourlyWeather: WeatherResponseDTO
+        ) = with(binding) {
             this.hourlyTemp.text = hourlyWeather.main.temp.toString()
             this.hourlyConditionsTv.text = hourlyWeather.weather[0].main
         }
     }
 
+    fun changeLocations(newWeather: Resource<WeatherResponseDTO>) {
+        hourlyWeather = newWeather
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): HourlyViewHolder {
-        return HourlyViewHolder(
-            HourlyItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        )
-    }
-
-    override fun onBindViewHolder(holder: HourlyAdapter.HourlyViewHolder, position: Int) = with(holder) {
-        val hourlyWeatherItem = hourlyWeather[position]
-        loadData(hourlyWeatherItem)
-        holder.itemView.setOnClickListener {
-
+    ) = HourlyItemBinding.inflate(
+        LayoutInflater.from(parent.context), parent, false
+    ).let {
+        HourlyViewHolder(it).apply {
+            itemView.setOnClickListener { onHourClicked.invoke(hourlyWeather[adapterPosition]) }
         }
     }
 
+    override fun onBindViewHolder(holder: HourlyViewHolder, position: Int) = with(holder) {
+        holder.loadData(hourlyWeather[position])
+    }
+
     override fun getItemCount(): Int {
-       return hourlyWeather.size
+        return hourlyWeather.size
     }
 }

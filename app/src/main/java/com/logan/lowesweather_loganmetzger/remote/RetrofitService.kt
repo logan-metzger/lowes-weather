@@ -25,9 +25,10 @@ object RetrofitService {
     }
 
     fun providesRetrofitService(): Retrofit =
-    Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(MoshiConverterFactory.create())
-        .build()
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(providesOkHttpClient())
+            .build()
 
 }

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.logan.lowesweather_loganmetzger.databinding.DetailsFragmentBinding
+import kotlinx.android.synthetic.main.details_fragment.*
 
 class DetailsFragment : Fragment() {
     private var _binding: DetailsFragmentBinding? = null
@@ -26,7 +27,12 @@ class DetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        with(binding) {
+
+        }
+
         viewModel.weather.observe(viewLifecycleOwner, Observer {
+
         })
     }
 }

@@ -15,11 +15,11 @@ class WeatherViewModel : ViewModel() {
         WeatherRepository()
     }
 
+    private val _query = MutableLiveData<String>()
+    private val _hasNavigated = MutableLiveData<Boolean>()
+
     private var _weather: MutableLiveData<Resource<WeatherResponseDTO>> = MutableLiveData()
     val weather: LiveData<Resource<WeatherResponseDTO>> get() = _weather
-//
-//    private var _loading: MutableLiveData<String> = MutableLiveData()
-//    val loading: LiveData<String> get() = _loading
 
     fun getWeather(city: String) {
         _weather.value = Resource.Loading
@@ -40,4 +40,15 @@ class WeatherViewModel : ViewModel() {
         }
     }
 
+    var query: String = ""
+        set(value) {
+            _query.value = value
+            field = value
+        }
+
+    var hasNavigated: Boolean = false
+        set(value) {
+            _hasNavigated.value = value
+            field = value
+        }
 }

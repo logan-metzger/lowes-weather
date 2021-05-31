@@ -21,7 +21,7 @@ class WeatherFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = WeatherFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -34,10 +34,7 @@ class WeatherFragment : Fragment() {
         }
 
         viewModel.weather.observe(viewLifecycleOwner, Observer {
+            hourlyAdapter.changeLocations(it)
         })
-    }
-
-    fun onHourClick() {
-
     }
 }
