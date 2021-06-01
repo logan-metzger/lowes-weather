@@ -4,51 +4,67 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.logan.lowesweather_loganmetzger.models.HourlyResponseDTO
 import com.logan.lowesweather_loganmetzger.models.WeatherResponseDTO
 import com.logan.lowesweather_loganmetzger.repositories.WeatherRepository
-import com.logan.lowesweather_loganmetzger.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WeatherViewModel : ViewModel() {
-    private val weatherRepository: WeatherRepository by lazy {
-        WeatherRepository()
-    }
 
-    private val _query = MutableLiveData<String>()
-    private val _hasNavigated = MutableLiveData<Boolean>()
+    private var _weather: MutableLiveData<WeatherResponseDTO> = MutableLiveData()
+    val weather: LiveData<WeatherResponseDTO> get() = _weather
 
-    private var _weather: MutableLiveData<Resource<WeatherResponseDTO>> = MutableLiveData()
-    val weather: LiveData<Resource<WeatherResponseDTO>> get() = _weather
+    // Holds value of selected weather item pressed by user
+    private var _selectedWeatherItem: MutableLiveData<HourlyResponseDTO> = MutableLiveData()
+    val selectedWeatherItm: LiveData<HourlyResponseDTO> get() = _selectedWeatherItem
+
+    // Holds boolean value for handling navigation once
+    private var _shouldNavigate: MutableLiveData<Boolean> = MutableLiveData()
+    val shouldNavigate: LiveData<Boolean> get() = _shouldNavigate
+
+    // Holds String value for handling search errors
+    private var _errorMsg: MutableLiveData<String> = MutableLiveData()
+    val errorMsg: LiveData<String> get() = _errorMsg
+
+    // Holds value for handling progress visibility
+    private var _progressIsVisible: MutableLiveData<Boolean> = MutableLiveData()
+    val progressIsVisible: LiveData<Boolean> get() = _progressIsVisible
+
+    // Holds value for search query
+    var cityName = ""
+        get() = field.toUpperCase()
 
     fun getWeather(city: String) {
-        _weather.value = Resource.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val weather = weatherRepository.getWeather(city)
-                val resource = if (weather.body() != null) Resource.Success(weather.body()!!)
-                else Resource.Error("No weather results")
-
-                _weather.postValue(
-                    resource
-                )
-            } catch (e: Exception) {
-                _weather.postValue(
-                    Resource.Error(e.toString())
-                )
+        if (city.isBlank().not()) {
+            cityName = city
+            _progressIsVisible.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = WeatherRepository.getWeather(city)
+                    if (response.body() != null && response.isSuccessful) {
+                        _shouldNavigate.postValue(true)
+                        _weather.postValue(response.body()!!)
+                        _errorMsg.postValue("")
+                    } else {
+                        _errorMsg.postValue("No weather results")
+                    }
+                    _progressIsVisible.postValue(false)
+                } catch (e: Exception) {
+                    _progressIsVisible.postValue(false)
+                    _errorMsg.postValue(e.message)
+                }
             }
+        } else {
+            _errorMsg.value = "Search cannot be empty"
         }
     }
 
-    var query: String = ""
-        set(value) {
-            _query.value = value
-            field = value
-        }
+    fun setShouldNavigate(shouldNavigate: Boolean) {
+        _shouldNavigate.value = shouldNavigate
+    }
 
-    var hasNavigated: Boolean = false
-        set(value) {
-            _hasNavigated.value = value
-            field = value
-        }
+    fun setUserSelectedWeatherItem(hourlyWeather: HourlyResponseDTO) {
+        _selectedWeatherItem.value = hourlyWeather
+    }
 }

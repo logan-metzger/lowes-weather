@@ -4,27 +4,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.logan.lowesweather_loganmetzger.databinding.HourlyItemBinding
-import com.logan.lowesweather_loganmetzger.models.WeatherResponseDTO
-import com.logan.lowesweather_loganmetzger.utils.Resource
+import com.logan.lowesweather_loganmetzger.models.WeatherDTO
+import com.logan.lowesweather_loganmetzger.models.HourlyResponseDTO
 
 class HourlyAdapter(
-    private val onHourClicked: (weather: WeatherResponseDTO) -> Unit,
-    private var hourlyWeather: List<WeatherResponseDTO>
+    private var hourlyWeather: List<HourlyResponseDTO>,
+    private val onHourClicked: (weather: HourlyResponseDTO) -> Unit
 ) : RecyclerView.Adapter<HourlyAdapter.HourlyViewHolder>() {
 
     class HourlyViewHolder(private val binding: HourlyItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun loadData(
-            hourlyWeather: WeatherResponseDTO
+            hourlyWeather: HourlyResponseDTO
         ) = with(binding) {
-            this.hourlyTemp.text = hourlyWeather.main.temp.toString()
-            this.hourlyConditionsTv.text = hourlyWeather.weather[0].main
+            this.hourlyTemp.text = hourlyWeather.weather[0].main
+            this.hourlyConditionsTv.text = "Temp: ${hourlyWeather.main.temp.toInt()}"
         }
-    }
-
-    fun changeLocations(newWeather: Resource<WeatherResponseDTO>) {
-        hourlyWeather = newWeather
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(
@@ -38,7 +33,7 @@ class HourlyAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: HourlyViewHolder, position: Int) = with(holder) {
+    override fun onBindViewHolder(holder: HourlyViewHolder, position: Int) {
         holder.loadData(hourlyWeather[position])
     }
 

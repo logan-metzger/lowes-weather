@@ -1,7 +1,9 @@
 package com.logan.lowesweather_loganmetzger.models
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class MainDTO(
     @Json(name = "feels_like")val feelsLike: Double,
     @Json(name = "grnd_level")val grndLevel: Int,

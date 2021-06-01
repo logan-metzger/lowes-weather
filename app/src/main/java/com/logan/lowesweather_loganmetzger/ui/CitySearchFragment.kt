@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment
 import com.logan.lowesweather_loganmetzger.R
 import com.logan.lowesweather_loganmetzger.databinding.CitySearchFragmentBinding
-import com.logan.lowesweather_loganmetzger.utils.Resource
 
 class CitySearchFragment : Fragment() {
     private var _binding: CitySearchFragmentBinding? = null
@@ -28,23 +28,29 @@ class CitySearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (requireActivity() as AppCompatActivity).supportActionBar?.hide()
 
-        binding.citySearchButton.setOnClickListener {
-            val cityName = binding.cityEt.text.toString()
-            viewModel.getWeather(cityName)
+        with(binding) {
+            citySearchButton.setOnClickListener {
+                val cityName = binding.cityEt.text.toString()
+                viewModel.getWeather(cityName)
+            }
 
-            viewModel.weather.observe(viewLifecycleOwner, Observer { response ->
-                when(response) {
-                    is Resource.Loading -> {
-
-                    }
-                    is Resource.Error -> {
-                        binding.cityInput.error = response.msg
-                    }
-                    is Resource.Success -> {
-                        NavHostFragment.findNavController(this).navigate(R.id.weatherFragment)
-                    }
+            viewModel.shouldNavigate.observe(viewLifecycleOwner, {
+                if (it == true) {
+                    NavHostFragment.findNavController(this@CitySearchFragment)
+                        .navigate(R.id.weatherFragment)
+                    viewModel.setShouldNavigate(false)
                 }
+            })
+
+            viewModel.errorMsg.observe(viewLifecycleOwner, {
+                cityInput.error = it
+            })
+
+            viewModel.progressIsVisible.observe(viewLifecycleOwner, {
+                progressBar.isVisible = it
+                citySearchButton.isEnabled = !it
             })
         }
     }

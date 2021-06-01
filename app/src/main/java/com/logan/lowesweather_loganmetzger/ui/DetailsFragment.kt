@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import com.logan.lowesweather_loganmetzger.databinding.DetailsFragmentBinding
-import kotlinx.android.synthetic.main.details_fragment.*
 
 class DetailsFragment : Fragment() {
     private var _binding: DetailsFragmentBinding? = null
@@ -26,13 +25,20 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = viewModel.cityName
 
         with(binding) {
-
+            viewModel.selectedWeatherItm.observe(viewLifecycleOwner, {
+                weatherMainTv.text = it.weather[0].main
+                weatherDescriptionTv.text = it.weather[0].description
+                feelsLikeTv.text = "Feels like: ${it.main?.feelsLike?.toInt()}"
+                tempTv.text = it.main.temp.toInt().toString()
+            })
         }
+    }
 
-        viewModel.weather.observe(viewLifecycleOwner, Observer {
-
-        })
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
